@@ -1,6 +1,7 @@
 .classpath
 .project
 target
+target-eclipse
 .settings
 derby.log
 *.class

@@ -54,12 +54,10 @@ class ExternalCommand {
 		return false;
 	}
 
-	@Override
 	public List<String> getStdOut() {
 		return stdout
 	}
 
-	@Override
 	public List<String> getStdErr() {
 		return stderr
 	}
@@ -91,6 +89,7 @@ class ExternalCommand {
 
 	}
 	
+	@Override
 	public String toString() {
 		return 'command: "'+command()+'", stdout: "'+stdout+'", stderr: "'+stderr+'", exitCode: "'+exitCode+'"'
 	}

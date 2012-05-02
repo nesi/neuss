@@ -5,7 +5,7 @@ import java.util.List;
 
 class ExternalCommand {
 	
-	static boolean useSSH = true
+	static boolean useSSH = false
 
     static constraints = {
 		command(blank:false)

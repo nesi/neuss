@@ -2,5 +2,5 @@ package neuss
 
 class UserController {
 
-    def scaffold = true
+    def scaffold = neuss.User
 }

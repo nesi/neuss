@@ -48,14 +48,10 @@ class UserCollectionResource {
 	def getExternalUserResource(@PathParam('username') String username, @PathParam('external') String external) {
 		
 		User u = userResourceService.findByUserName(username)
-		def classname = 'neuss.model.'+external.capitalize()+'User'
-
-		Class euc = Class.forName(classname, true, Thread.currentThread().contextClassLoader)
-
-		def eu = euc.newInstance(u)
 		
 		ExternalUserResource er = new ExternalUserResource()
-		er.setExternalUser(eu)
+		er.setUser(u)
+		er.setExternalServiceName(external)
 		er
 	}
 

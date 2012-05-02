@@ -8,6 +8,9 @@ import static javax.ws.rs.core.Response.Status.CONFLICT
 class UserResourceService {
     
     def create(User dto) {
+		if ( ! dto.validate() ) {
+			throw new DomainObjectException(dto, CONFLICT, "Error when validating new user: "+dto.errors.allErrors)
+		}
         dto.save()
     }
 
@@ -24,7 +27,14 @@ class UserResourceService {
     }
     
     def update(User newUser) {
-        def obj = User.get(newUser.id)
+		def obj = null
+		if ( newUser.id ) {
+			obj = User.get(newUser.id)
+		} else {
+			obj = findByUserName(newUser.userName)
+		}
+
+		println obj
         if (!obj) {
 			throw new DomainObjectNotFoundException(User.class, newUser.id)
         }

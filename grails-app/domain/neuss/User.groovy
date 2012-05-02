@@ -1,21 +1,19 @@
 package neuss
 
 class User {
-	
-	static def countries = [] as SortedSet
+
+	static def countries = []as SortedSet 
 	
 	{
-	Locale.availableLocales.displayCountry.each {
-	  if (it) {
-		countries << it
-	  }
-	}
-	}
-	
-	
-	static mapping = {
-		autoTimestamp true
+		Locale.availableLocales.displayCountry.each {
+			if (it) {
+				countries << it
+			}
 		}
+	}
+
+
+	static mapping = { autoTimestamp true }
 
 
 	static constraints = {
@@ -30,9 +28,8 @@ class User {
 		position(nullable:true)
 		address(nullable:true)
 		nationality(inList: countries.asList())
-		
 	}
-	
+
 	String userName
 	String firstName
 	String middleName
@@ -44,12 +41,37 @@ class User {
 	String email
 	String address
 	String nationality = "New Zealand"
-	
+
 	Date dateCreated
 	Date lastUpdated
-	
+
+	private Map properties = [:]
+	private Map services = [:]
+
 	public String toString() {
 		return userName
 	}
 
+	public void addUserProperty(String key, String value) {
+
+		properties.put(key, value)
+		save()
+	}
+
+	public void removeUserProperty(String key) {
+		properties.remove(key)
+		save()
+	}
+
+	public void register(String serviceName) {
+		
+		def classname = 'neuss.model.'+serviceName.capitalize()+'User'
+		Class euc = Class.forName(classname, true, Thread.currentThread().contextClassLoader)
+
+		def eu = euc.newInstance()
+		eu.setUser(this)
+		def username = eu.register()
+		
+		services.put(serviceName, username)
+	}
 }

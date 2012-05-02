@@ -23,9 +23,8 @@ import static org.grails.jaxrs.response.Responses.*
 @Produces(['application/xml','application/json'])
 class ExternalUserResource {
 	
-	def userResourceService
-
-	ExternalUser externalUser
+	User user
+	String externalServiceName
 	
 	private Map generateDetailsMap(def command=null) {
 		def propertiesMap = [:]
@@ -53,6 +52,14 @@ class ExternalUserResource {
 	@Produces('text/plain')
 	String returnStateString() {
 		return generateDetailsMap(null).toString()
+	}
+	
+	@POST
+	@Path('/register')
+	void register() {
+
+		user.register(externalServiceName)
+
 	}
 
 	
@@ -85,7 +92,7 @@ class ExternalUserResource {
 	def executeCommand(String command) {
 		
 		try {
-			def result = externalUser."$command"()
+			def result = user."$command"()
 			result
 		} catch (MissingMethodException mme) {
 			println mme

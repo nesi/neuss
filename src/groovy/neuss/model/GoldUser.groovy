@@ -17,19 +17,20 @@ class GoldUser implements ExternalUser {
 	
 
 	
-	public GoldUser(User user) {
+	public GoldUser() {
+	}
+	
+	public void setUser(User user) {
 		this.user = user
 	}
 	
 	User user
-	String goldUserName
 	
 	public boolean isRegistered() {
 		
 		ExternalCommand gc = executeGoldCommand("glsuser -show Name -quiet")
 		
-		def un = user.getUserName()
-		if ( gc.stdout.contains(un) ) {
+		if ( gc.stdout.contains(getUserName()) ) {
 			return true
 		} else {
 			return false
@@ -37,28 +38,26 @@ class GoldUser implements ExternalUser {
 		
 	}
 	
-	public ExternalCommand register() throws ExternalCommandException {
-		
-		
-		if ( isRegistered() ) {
-			throw new ExternalCommandException("register", CONFLICT, 'User '+user.userName+' already in Gold.')
-		}
+	
+	public String register() throws ExternalCommandException {
 		
 		def name = user.lastName + ', ' + user.firstName
 		def email = user.email
 		def phone = user.phone
-		def username = user.userName
-		ExternalCommand gc = executeGoldCommand('gmkuser -n "'+name+'" -E '+email+' '+username)
-		
-		if ( ! isRegistered() ) {
-			throw new ExternalCommandException('register', CONFLICT, 'Adding of user '+user.userName+' to Gold failed')
+
+		if ( isRegistered() ) {
+			throw new ExternalCommandException("register", CONFLICT, 'User '+getUserName()+' already in Gold.')
 		}
 		
-		gc
+		ExternalCommand gc = executeGoldCommand('gmkuser -n "'+name+'" -E '+email+' '+getUserName())
 		
+		if ( ! isRegistered() ) {
+			throw new ExternalCommandException('register', CONFLICT, 'Adding of user '+getUserName()+' to Gold failed')
+		}
+		
+		getUserName()
 	}
 	
-	@XmlAttribute(name="goldUserName")
 	public String getUserName() {
 		
 		return user.getUserName()
@@ -71,9 +70,10 @@ class GoldUser implements ExternalUser {
 	}
 
 	@Override
-	public ExternalCommand deregister() throws ExternalCommandException {
+	public void deregister() throws ExternalCommandException {
 		if ( ! isRegistered() ) {
-			throw new ExternalCommandException("deregister", CONFLICT, 'User '+user.userName+' not registered in Gold.')
+			//throw new ExternalCommandException("deregister", CONFLICT, 'User '+getUserName()+' not registered in Gold.')
+			return
 		}
 		def name = user.lastName + ', ' + user.firstName
 		def email = user.email
@@ -81,10 +81,8 @@ class GoldUser implements ExternalUser {
 		ExternalCommand gc = executeGoldCommand('grmuser '+getUserName())
 		
 		if ( isRegistered() ) {
-			throw new ExternalCommandException('deregister', CONFLICT, 'Removing of user '+user.userName+' from Gold failed')
+			throw new ExternalCommandException('deregister', CONFLICT, 'Removing of user '+getUserName()+' from Gold failed')
 		}
-		
-		gc
 		
 	}
 	

@@ -83,3 +83,40 @@ example input (json):
 			"address":"Building 409, Rm G21, LG, 24 Symonds Street, Auckland"
 	}
 
+
+### Get registration details on external services (e.g. Gold)
+
+path: /users/{username}/{serviceName}
+method: GET
+produces: xml & json & text
+
+example output (json):
+
+/users/markus/gold
+
+    {
+	    "isRegistered":true,
+		"goldUserName":"markus"
+	}
+	
+### Register a user on an external service (e.g. Gold)
+
+path: /users/{username}/{serviceName}/register
+method: POST
+produces: nothing (exception if user already in service or registration failed for some reason)
+
+example:
+
+/users/markus/gold/register
+
+### Remove a user from an external service (e.g. Gold)
+
+path: /users/{username}/{serviceName}
+method: DELETE
+produces: nothing
+
+example:
+
+/users/markus/gold
+
+

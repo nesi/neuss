@@ -1,5 +1,7 @@
 package neuss
 
+import neuss.model.ExternalUser
+
 class User {
 
 	static def countries = []as SortedSet 
@@ -15,6 +17,7 @@ class User {
 
 	static mapping = { autoTimestamp true }
 
+	static transients = [ "externalUserCache" ]
 
 	static constraints = {
 		userName(blank:false, unique:true)
@@ -47,6 +50,8 @@ class User {
 
 	private Map properties = [:]
 	private Map services = [:]
+	
+	private Map externalUserCache = [:]
 
 	public String toString() {
 		return userName
@@ -64,14 +69,50 @@ class User {
 	}
 
 	public void register(String serviceName) {
-		
-		def classname = 'neuss.model.'+serviceName.capitalize()+'User'
-		Class euc = Class.forName(classname, true, Thread.currentThread().contextClassLoader)
 
-		def eu = euc.newInstance()
-		eu.setUser(this)
+		ExternalUser eu = getExternalUser(serviceName)
 		def username = eu.register()
-		
+
 		services.put(serviceName, username)
+	}
+	
+	public void deregister(String serviceName) {
+		
+		ExternalUser eu = getExternalUser(serviceName)
+		def username = eu.deregister()
+	
+		services.remove(serviceName)
+	}
+	
+	public boolean isRegistered(String serviceName) {
+		
+		ExternalUser eu = getExternalUser(serviceName)
+		return eu.isRegistered()
+
+	}
+	
+	/**
+	 * This one creates external users whenever necessary.
+	 * 
+	 * @param serviceName the name of the service
+	 * @return the external user object
+	 */
+	private ExternalUser getExternalUser(String serviceName) {
+		
+		if ( ! externalUserCache[serviceName] ) {
+			def classname = 'neuss.model.'+serviceName.capitalize()+'User'
+			Class euc = Class.forName(classname, true, Thread.currentThread().contextClassLoader)
+
+			def eu = euc.newInstance()
+			eu.setUser(this)
+			externalUserCache[serviceName] = eu
+		}
+		externalUserCache[serviceName]
+	}
+	
+	public String getUserName(String serviceName) {
+		
+		ExternalUser eu = getExternalUser(serviceName)
+		return eu.getUserName()
 	}
 }

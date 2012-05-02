@@ -4,6 +4,7 @@ import grails.converters.JSON
 import grails.converters.XML
 
 import javax.ws.rs.Consumes
+import javax.ws.rs.DELETE;
 import javax.ws.rs.GET
 import javax.ws.rs.POST
 import javax.ws.rs.Path
@@ -28,8 +29,8 @@ class ExternalUserResource {
 	
 	private Map generateDetailsMap(def command=null) {
 		def propertiesMap = [:]
-		propertiesMap['isRegistered'] = externalUser.isRegistered()
-		propertiesMap['goldUserName'] = externalUser.getUserName()
+		propertiesMap['isRegistered'] = user.isRegistered(externalServiceName)
+		propertiesMap['goldUserName'] = user.getUserName(externalServiceName)
 		if ( command ) {
 			propertiesMap['command'] = command
 		}
@@ -88,6 +89,11 @@ class ExternalUserResource {
 		
 		ok generateDetailsMap(result) as JSON
 	}
+	
+	@DELETE
+	void remove() {
+		user.deregister(externalServiceName)
+	}
 
 	def executeCommand(String command) {
 		
@@ -98,9 +104,6 @@ class ExternalUserResource {
 			println mme
 			throw new ExternalCommandException(command)
 		}
-		
-
-		
 		
 	}
 	 
